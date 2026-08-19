@@ -1,9 +1,11 @@
 import unittest
-from ics import Calendar
-from freezegun import freeze_time
 
-from fb2cal.ics_writer import ICSWriter
+from freezegun import freeze_time
+from ics import Calendar
+
 from fb2cal.facebook_user import FacebookUser
+from fb2cal.ics_writer import ICSWriter
+
 
 class TestICSWriter(unittest.TestCase):
     def setUp(self):
@@ -161,3 +163,13 @@ END:VCALENDAR
             self.assertEqual(actual.begin, expected.begin)
             self.assertEqual(actual.duration, expected.duration)
             self.assertEqual(actual.description, expected.description)
+
+    @freeze_time("2021-01-01")
+    def test_unknown_year_february_29_uses_non_leap_target_year(self):
+        contact = FacebookUser(
+            '100000007', 'Unknown Leap', 'https://www.facebook.com/unknown.leap', None, 29, 2, None
+        )
+        writer = ICSWriter([contact])
+        writer.generate()
+        event = next(iter(writer.get_birthday_calendar().events))
+        self.assertEqual(event.begin.format('YYYY-MM-DD'), '2021-02-28')

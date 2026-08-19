@@ -1,7 +1,9 @@
 import unittest
-from fb2cal.transformer import Transformer
 
 from mocks.birthday_comet_root_mocks import BIRTHDAY_COMET_ROOT_JANUARY_MOCK
+
+from fb2cal.transformer import Transformer
+
 
 class TestTransformer(unittest.TestCase):
     def setUp(self):
