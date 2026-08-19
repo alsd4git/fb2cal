@@ -1,13 +1,14 @@
+import calendar
 import os
+from datetime import datetime, timedelta, timezone
+
+from dateutil.relativedelta import relativedelta
 from ics import Calendar, Event
 from ics.grammar.parse import ContentLine
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-import calendar
 
+from .__init__ import __github_short_url__, __status__, __version__
 from .logger import Logger
 from .utils import generate_facebook_profile_url_permalink
-from .__init__ import __version__, __status__, __github_short_url__
 
 """ Write Birthdays to an ICS file """
 class ICSWriter:
@@ -25,7 +26,9 @@ class ICSWriter:
         c.extra.append(ContentLine(name='X-PUBLISHED-TTL', value='PT12H'))
         c.extra.append(ContentLine(name='X-ORIGINAL-URL', value='/events/birthdays/'))
 
-        cur_date = datetime.now()
+        # Keep the existing naive date representation while making the clock
+        # source explicit and deterministic across host time zones.
+        cur_date = datetime.now(timezone.utc).replace(tzinfo=None)
 
         for facebook_user in self.facebook_users:
             # Don't add extra 's' if name already ends with 's'
@@ -37,15 +40,15 @@ class ICSWriter:
             month = facebook_user.birthday_month
             year = facebook_user.birthday_year
 
-            # Feb 29 special case:
-            # If event year is not a leap year, use Feb 28 as birthday date instead
-            if facebook_user.birthday_month == 2 and facebook_user.birthday_day == 29 and not calendar.isleap(year):
-                day = 28
-
             # The birth year may not be visible due to privacy settings
             # In this case, calculate the year as this year or next year based on if its past current month or not
             if year is None:
                 year = cur_date.year if facebook_user.birthday_month >= cur_date.month else (cur_date + relativedelta(years=1)).year
+
+            # Feb 29 special case:
+            # If event year is not a leap year, use Feb 28 as birthday date instead
+            if facebook_user.birthday_month == 2 and facebook_user.birthday_day == 29 and not calendar.isleap(year):
+                day = 28
 
             # Format date components as needed
             month = f'{month:02}'
@@ -72,10 +75,11 @@ class ICSWriter:
         ics_str = ''.join([line.rstrip('\n') for line in self.birthday_calendar])
         self.logger.debug(f'ics_str: {ics_str}')
 
-        self.logger.info(f'Saving ICS file to local file system...')
+        self.logger.info('Saving ICS file to local file system...')
 
-        if not os.path.exists(os.path.dirname(ics_file_path)):
-            os.makedirs(os.path.dirname(ics_file_path), exist_ok=True)
+        directory = os.path.dirname(ics_file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
 
         with open(ics_file_path, mode='w', encoding="UTF-8") as ics_file:
             ics_file.write(ics_str)
