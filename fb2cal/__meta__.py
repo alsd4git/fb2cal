@@ -17,4 +17,4 @@ __download_url__= f'https://github.com/mobeigi/fb2cal/archive/v{__version__}.tar
 
 
 # Make metadata public to script
-__all__ = ['__author__', '__copyright__', '__description__', '__email__', '__license__', '__maintainer__', '__status__', '__title__', '__version_info__', '__version__', '__github_url__', '__github_short_url__', '__github_assets_absolute_url__', '__download_url__']
+__all__ = ['__author__', '__copyright__', '__description__', '__download_url__', '__email__', '__github_assets_absolute_url__', '__github_short_url__', '__github_url__', '__license__', '__maintainer__', '__status__', '__title__', '__version__', '__version_info__']
