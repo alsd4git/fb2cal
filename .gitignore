@@ -1,6 +1,10 @@
 # Config file
 config/config.ini
 
+# Explicit browser session exports (bearer credentials)
+facebook-cookies*.json
+cookies.json
+
 # Logs
 logs/
 
