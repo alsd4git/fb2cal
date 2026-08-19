@@ -1,13 +1,14 @@
 import base64
-import struct
-import datetime
 import binascii
+import datetime
+import struct
 
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
 from nacl.public import PublicKey, SealedBox
 
 from .facebook_user import FacebookUser
+
 
 # Generates permalink to Facebook profile url
 # This is needed in many cases as the vanity url may change over time
@@ -29,7 +30,7 @@ def facebook_web_encrypt_password(key_id, pub_key, password, version=5):
     key = Random.get_random_bytes(32)
     iv = bytes([0] * 12)
 
-    time = int(datetime.datetime.now().timestamp())
+    time = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
 
     aes = AES.new(key, AES.MODE_GCM, nonce=iv, mac_len=16)
     aes.update(str(time).encode('utf-8'))
