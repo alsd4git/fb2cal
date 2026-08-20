@@ -19,7 +19,8 @@ deduplicates the visible birthdays for a full year and exports them as:
 
 - ICS calendar events for Google Calendar, Apple Calendar, and similar clients;
 - JSON contact data for automation and inspection;
-- vCard 3.0 contacts for address-book imports.
+- vCard 4.0 contacts for address-book imports, with a vCard 3.0 compatibility mode for older
+  clients.
 
 The export includes only birthdays visible to the authenticated Facebook account. A total profile
 friend count is not available in the birthday query and is intentionally not fetched through a
@@ -56,6 +57,8 @@ personal contact data.
 uv run fb2cal export --cookies ./facebook-cookies.json --format ics --output ./out/birthdays.ics
 uv run fb2cal export --cookies ./facebook-cookies.json --format json --output ./out/birthdays.json
 uv run fb2cal export --cookies ./facebook-cookies.json --format vcf --output ./out/birthdays.vcf
+uv run fb2cal export --cookies ./facebook-cookies.json --format vcf \
+  --vcard-version 3.0 --output ./out/birthdays-v3.vcf
 ```
 
 Without `--output`, the selected format is written to stdout. The extraction summary is always
@@ -70,6 +73,11 @@ Extraction summary:
 ```
 
 The JSON export contains the same counts under its top-level `summary` object.
+
+The VCF export uses vCard 4.0 by default. Dates use the standards-defined basic format, including
+`--MMDD` when Facebook exposes a birthday without a year. Use `--vcard-version 3.0` only for
+address-book clients that do not support vCard 4.0; that legacy format keeps the older hyphenated
+date representation and may be less interoperable for yearless birthdays.
 
 ## Exporting Chrome cookies safely
 
@@ -95,7 +103,7 @@ Treat the exported file as a password: cookies are bearer credentials.
 
 ```text
 fb2cal doctor --cookies PATH [--json] [--log-level LEVEL]
-fb2cal export --cookies PATH [--format ics|json|vcf] [--output PATH] [--log-level LEVEL]
+fb2cal export --cookies PATH [--format ics|json|vcf] [--vcard-version 4.0|3.0] [--output PATH] [--log-level LEVEL]
 ```
 
 `--log-level` accepts `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`. The browser session is
