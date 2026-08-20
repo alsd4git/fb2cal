@@ -1,9 +1,11 @@
 __author__ = "Alessandro Digilio"
-__copyright__ = "Copyright 2019-2020 Mo Beigi; fork maintained by Alessandro Digilio"
+__copyright__ = (
+    "Copyright 2019-2020 Mo Beigi; modifications Copyright 2026 Alessandro Digilio"
+)
 __description__ = "Fetch Facebook birthdays and export calendar/contact files"
 __email__ = ""
 __keywords__ = ["facebook", "birthday", "calendar", "export", "ics"]
-__license__ = "GPLv3"
+__license__ = "GPL-3.0-or-later"
 __maintainer__ = "Alessandro Digilio"
 __status__ = "Production"
 __title__ = "fb2cal"

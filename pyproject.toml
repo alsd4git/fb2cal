@@ -8,7 +8,7 @@ version = "2.0.0"
 description = "Fetch Facebook birthdays and export calendar/contact files"
 readme = "README.md"
 requires-python = ">=3.10"
-license = "GPL-3.0-only"
+license = "GPL-3.0-or-later"
 authors = [{ name = "Alessandro Digilio" }]
 keywords = ["facebook", "birthday", "calendar", "export", "ics"]
 classifiers = [

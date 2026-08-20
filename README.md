@@ -151,4 +151,4 @@ compatible with the upstream architecture may later be proposed upstream as focu
 
 ## License
 
-GNU General Public License v3.0. See [LICENSE](https://github.com/alsd4git/fb2cal/blob/main/LICENSE).
+GNU General Public License v3.0 or later. See [LICENSE](https://github.com/alsd4git/fb2cal/blob/main/LICENSE).

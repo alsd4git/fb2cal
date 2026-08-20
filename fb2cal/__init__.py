@@ -1,6 +1,8 @@
 """
 fb2cal - Facebook birthday exporter
 Original project by Mo Beigi; fork maintained by Alessandro Digilio
+This is a modified version of the original fb2cal project.
+Modifications Copyright (C) 2026 Alessandro Digilio.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
