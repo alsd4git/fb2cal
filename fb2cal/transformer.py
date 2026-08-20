@@ -1,14 +1,15 @@
+from .contact import BirthdayContact
 from .errors import GraphQLSchemaError
-from .facebook_user import FacebookUser
 
 
 class Transformer:
-
     def transform_birthday_comet_monthly_to_birthdays(self, birthday_comet_root_json):
         """Transform BirthdayCometMonthlyBirthdaysRefetchQuery into contacts."""
 
         try:
-            edges = birthday_comet_root_json['data']['viewer']['all_friends_by_birthday_month']['edges']
+            edges = birthday_comet_root_json["data"]["viewer"][
+                "all_friends_by_birthday_month"
+            ]["edges"]
         except (KeyError, TypeError) as exc:
             raise GraphQLSchemaError(
                 "Facebook birthday response is missing all_friends_by_birthday_month.edges"
@@ -16,17 +17,19 @@ class Transformer:
         if not isinstance(edges, list):
             raise GraphQLSchemaError("Facebook birthday edges is not a list")
 
-        facebook_users = []
+        contacts = []
 
         try:
             for all_friends_by_birthday_month_edge in edges:
-                for friend_edge in all_friends_by_birthday_month_edge['node']['friends']['edges']:
-                    friend = friend_edge['node']
-                    birthdate = friend['birthdate']
-                    picture = friend.get('profile_picture') or {}
+                for friend_edge in all_friends_by_birthday_month_edge["node"][
+                    "friends"
+                ]["edges"]:
+                    friend = friend_edge["node"]
+                    birthdate = friend["birthdate"]
+                    picture = friend.get("profile_picture") or {}
 
-                    facebook_users.append(
-                        FacebookUser(
+                    contacts.append(
+                        BirthdayContact(
                             friend["id"],
                             friend["name"],
                             friend.get("profile_url"),
@@ -37,6 +40,8 @@ class Transformer:
                         )
                     )
         except (KeyError, TypeError) as exc:
-            raise GraphQLSchemaError("Facebook birthday response has an unexpected friend schema") from exc
+            raise GraphQLSchemaError(
+                "Facebook birthday response has an unexpected friend schema"
+            ) from exc
 
-        return facebook_users
+        return contacts

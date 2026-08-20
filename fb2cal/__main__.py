@@ -8,7 +8,6 @@ import json
 import logging
 import sys
 
-from .config import Config
 from .errors import (
     AuthenticationError,
     ConfigurationError,
@@ -18,7 +17,6 @@ from .errors import (
     GraphQLSchemaError,
     TokenExtractionError,
 )
-from .facebook_browser import FacebookBrowser
 from .facebook_client import FacebookClient
 from .facebook_session import FacebookSession
 from .ics_writer import ICSWriter
@@ -26,33 +24,46 @@ from .json_exporter import JSONExporter
 from .logger import Logger
 from .pipeline import extract_birthdays, summarize_contacts
 from .transformer import Transformer
-from .utils import strtobool
 from .vcard_exporter import VCardExporter
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(prog="fb2cal", description="Export Facebook birthdays")
+    parser = argparse.ArgumentParser(
+        prog="fb2cal", description="Export Facebook birthdays"
+    )
     subparsers = parser.add_subparsers(dest="command")
     export = subparsers.add_parser("export", help="fetch birthdays and export them")
     _add_auth_args(export)
     export.add_argument("--format", choices=("ics", "json", "vcf"), default="ics")
-    export.add_argument("--output", help="output path; omit to write the selected format to stdout")
-    doctor = subparsers.add_parser("doctor", help="validate auth, token, query, and response schema")
+    export.add_argument(
+        "--output", help="output path; omit to write the selected format to stdout"
+    )
+    doctor = subparsers.add_parser(
+        "doctor", help="validate auth, token, query, and response schema"
+    )
     _add_auth_args(doctor)
-    doctor.add_argument("--json", action="store_true", help="emit machine-readable diagnostics")
+    doctor.add_argument(
+        "--json", action="store_true", help="emit machine-readable diagnostics"
+    )
     return parser
 
 
 def _add_auth_args(parser):
-    parser.add_argument("--cookies", help="explicit JSON cookie export; never read automatically")
-    parser.add_argument("--config", help="legacy config.ini path")
-    parser.add_argument("--email", help="legacy Facebook email")
-    parser.add_argument("--password", help="legacy Facebook password")
+    parser.add_argument(
+        "--cookies",
+        required=True,
+        help="explicit JSON cookie export; browser profiles are never scanned automatically",
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
+        default="INFO",
+        help="logging verbosity (default: INFO)",
+    )
 
 
-def _configure_logging(config=None):
+def _configure_logging(level="INFO"):
     logger = Logger("fb2cal").getLogger()
-    level = config.get("LOGGING", "level", fallback="INFO") if config is not None else "INFO"
     try:
         logger.setLevel(getattr(logging, level.upper()))
     except AttributeError as exc:
@@ -61,19 +72,13 @@ def _configure_logging(config=None):
     return logger
 
 
-def _create_client(args, legacy=False):
-    config = Config(path=args.config, required=legacy or not args.cookies).getConfig()
-    _configure_logging(config)
-    cookie_path = args.cookies or config.get("AUTH", "cookies_file", fallback="")
-    if cookie_path:
-        return FacebookClient(session=FacebookSession.from_cookie_file(cookie_path)), config
-    email = args.email or config.get("AUTH", "fb_email", fallback="")
-    password = args.password or config.get("AUTH", "fb_pass", fallback="")
-    if not email or not password:
-        raise ConfigurationError("Provide --cookies, or legacy --email/--password/config credentials")
-    browser = FacebookBrowser()
-    browser.authenticate(email, password)
-    return browser, config
+def _create_client(args):
+    _configure_logging(args.log_level)
+    if not args.cookies:
+        raise ConfigurationError(
+            "Provide an explicit browser cookie export with --cookies"
+        )
+    return FacebookClient(session=FacebookSession.from_cookie_file(args.cookies))
 
 
 def _export_contacts(contacts, output_format, output_path):
@@ -98,17 +103,17 @@ def _export_contacts(contacts, output_format, output_path):
 def _print_recap(contacts):
     summary = summarize_contacts(contacts)
     print(
-        "Recap estrazione:\n"
-        f"  amici con compleanno visibile: {summary.contacts}\n"
-        f"  compleanni con anno: {summary.with_year}\n"
-        f"  compleanni senza anno: {summary.without_year}\n"
-        "  totale amici del profilo: non disponibile nella birthday query",
+        "Extraction summary:\n"
+        f"  friends with visible birthdays: {summary.contacts}\n"
+        f"  birthdays with year: {summary.with_year}\n"
+        f"  birthdays without year: {summary.without_year}\n"
+        "  total profile friends: unavailable from the birthday query",
         file=sys.stderr,
     )
 
 
 def run_export(args):
-    client, _ = _create_client(args)
+    client = _create_client(args)
     client.validate_session()
     contacts = extract_birthdays(client)
     _export_contacts(contacts, args.format, args.output)
@@ -117,31 +122,23 @@ def run_export(args):
 
 
 def run_doctor(args):
-    client, _ = _create_client(args)
+    client = _create_client(args)
     validation = client.validate_session()
     response = client.query_graph_ql_birthday_comet_monthly(0)
     Transformer().transform_birthday_comet_monthly_to_birthdays(response)
-    result = {"session": validation.status, "user_id": validation.user_id, "fb_dtsg": "present", "graphql": "ok", "schema": "ok"}
+    result = {
+        "session": validation.status,
+        "user_id": validation.user_id,
+        "fb_dtsg": "present",
+        "graphql": "ok",
+        "schema": "ok",
+    }
     if args.json:
         print(json.dumps(result))
     else:
-        print("Session: authenticated\nfb_dtsg: present\nGraphQL query: ok\nBirthday schema: ok")
-    return 0
-
-
-def run_legacy_config():
-    config = Config(required=True).getConfig()
-    _configure_logging(config)
-    browser = FacebookBrowser()
-    browser.authenticate(config["AUTH"]["FB_EMAIL"], config["AUTH"]["FB_PASS"])
-    contacts = extract_birthdays(browser)
-    if not contacts:
-        raise GraphQLSchemaError("Facebook returned no birthday contacts")
-    writer = ICSWriter(contacts)
-    writer.generate()
-    if strtobool(config["FILESYSTEM"].get("SAVE_TO_FILE", "True")):
-        writer.write(config["FILESYSTEM"].get("ICS_FILE_PATH", "./out/birthdays.ics"))
-    _print_recap(contacts)
+        print(
+            "Session: authenticated\nfb_dtsg: present\nGraphQL query: ok\nBirthday schema: ok"
+        )
     return 0
 
 
@@ -163,7 +160,8 @@ def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         if not argv:
-            return run_legacy_config()
+            build_parser().print_help()
+            return 2
         args = build_parser().parse_args(argv)
         if args.command == "export":
             return run_export(args)
@@ -174,7 +172,7 @@ def main(argv=None):
     except FacebookError as exc:
         print(f"fb2cal: {exc}", file=sys.stderr)
         return _exit_code(exc)
-    except (KeyError, ValueError) as exc:
+    except ValueError as exc:
         print(f"fb2cal: invalid configuration: {exc}", file=sys.stderr)
         return 2
     finally:

@@ -38,7 +38,9 @@ class FacebookSession(requests.Session):
                     stacklevel=2,
                 )
         except OSError as exc:
-            raise CookieFileError(f"Could not inspect cookie file: {cookie_path}") from exc
+            raise CookieFileError(
+                f"Could not inspect cookie file: {cookie_path}"
+            ) from exc
 
         try:
             raw = json.loads(cookie_path.read_text(encoding="utf-8"))
@@ -47,7 +49,9 @@ class FacebookSession(requests.Session):
 
         cookies = raw.get("cookies") if isinstance(raw, Mapping) else raw
         if not isinstance(cookies, list):
-            raise CookieFileError("Cookie JSON must be a list or an object with a 'cookies' list")
+            raise CookieFileError(
+                "Cookie JSON must be a list or an object with a 'cookies' list"
+            )
 
         session = cls()
         for item in cookies:
@@ -55,7 +59,9 @@ class FacebookSession(requests.Session):
             session.cookies.set_cookie(cookie)
 
         if not session.cookies.get("c_user"):
-            raise CookieFileError("Cookie file does not contain the required c_user cookie")
+            raise CookieFileError(
+                "Cookie file does not contain the required c_user cookie"
+            )
         return session
 
     @staticmethod
@@ -81,11 +87,15 @@ class FacebookSession(requests.Session):
             try:
                 kwargs["expires"] = int(item["expirationDate"])
             except (TypeError, ValueError) as exc:
-                raise CookieFileError(f"Invalid expirationDate for cookie {name}") from exc
+                raise CookieFileError(
+                    f"Invalid expirationDate for cookie {name}"
+                ) from exc
         elif item.get("expires") is not None:
             try:
                 kwargs["expires"] = int(item["expires"])
             except (TypeError, ValueError) as exc:
-                raise CookieFileError(f"Invalid expires value for cookie {name}") from exc
+                raise CookieFileError(
+                    f"Invalid expires value for cookie {name}"
+                ) from exc
 
         return requests.cookies.create_cookie(name=name, value=value, **kwargs)

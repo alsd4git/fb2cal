@@ -35,9 +35,17 @@ def parse_birthday_response(text: str) -> dict[str, Any]:
     if not isinstance(response, dict):
         raise GraphQLSchemaError("Facebook GraphQL response is not an object")
     if response.get("error") is not None or response.get("errors"):
-        summary = response.get("errorSummary") or response.get("errorDescription") or "unknown GraphQL error"
+        summary = (
+            response.get("errorSummary")
+            or response.get("errorDescription")
+            or "unknown GraphQL error"
+        )
         message = str(summary)
-        if "doc" in message.lower() or "persist" in message.lower() or "query" in message.lower():
+        if (
+            "doc" in message.lower()
+            or "persist" in message.lower()
+            or "query" in message.lower()
+        ):
             raise PersistedQueryError(
                 f"Facebook persisted query {BIRTHDAY_QUERY_NAME} (doc_id {BIRTHDAY_QUERY_DOC_ID}) "
                 "may be obsolete; update the query definition."
@@ -46,5 +54,7 @@ def parse_birthday_response(text: str) -> dict[str, Any]:
 
     data = response.get("data")
     if not isinstance(data, dict):
-        raise GraphQLSchemaError("Facebook GraphQL response does not contain a data object")
+        raise GraphQLSchemaError(
+            "Facebook GraphQL response does not contain a data object"
+        )
     return response

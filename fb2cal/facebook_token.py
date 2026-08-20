@@ -26,4 +26,6 @@ class FacebookDTSGParser:
             match = pattern.search(candidate_text)
             if match and match.group(1):
                 return match.group(1)
-        raise TokenExtractionError("Could not extract fb_dtsg from the Facebook birthday page")
+        raise TokenExtractionError(
+            "Could not extract fb_dtsg from the Facebook birthday page"
+        )

@@ -59,21 +59,33 @@ class FacebookClient:
             return False
         return True
 
-    def query_graph_ql_birthday_comet_monthly(self, offset_month: int) -> dict[str, Any]:
+    def query_graph_ql_birthday_comet_monthly(
+        self, offset_month: int
+    ) -> dict[str, Any]:
         payload = build_birthday_payload(offset_month, self.get_token())
         response = self.browser.post(GRAPHQL_ENDPOINT, data=payload)
         if response.status_code != 200:
-            raise GraphQLQueryError(f"Facebook GraphQL request returned HTTP {response.status_code}")
+            raise GraphQLQueryError(
+                f"Facebook GraphQL request returned HTTP {response.status_code}"
+            )
         return parse_birthday_response(response.text)
 
     def _raise_for_auth_response(self, response: Any) -> None:
         text = response.text or ""
         url = str(getattr(response, "url", ""))
         if getattr(response, "status_code", 0) in (401, 403) or "/login" in url:
-            raise SessionExpiredError("Facebook session is expired or login is required")
+            raise SessionExpiredError(
+                "Facebook session is expired or login is required"
+            )
         if "checkpointSubmitButton" in text or "/two_step_verification/" in text:
-            raise FacebookCheckpointError("Facebook requires checkpoint or two-step verification")
+            raise FacebookCheckpointError(
+                "Facebook requires checkpoint or two-step verification"
+            )
         if "login_form" in text and "DTSGInitialData" not in text:
-            raise SessionExpiredError("Facebook session is expired or login is required")
+            raise SessionExpiredError(
+                "Facebook session is expired or login is required"
+            )
         if getattr(response, "status_code", 0) != 200:
-            raise SessionExpiredError(f"Facebook birthday page returned HTTP {response.status_code}")
+            raise SessionExpiredError(
+                f"Facebook birthday page returned HTTP {response.status_code}"
+            )

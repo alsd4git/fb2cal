@@ -17,11 +17,6 @@ class BirthdayContact:
     birthday_year: int | None = None
     source: str = "facebook"
 
-    @property
-    def profile_picture_uri(self) -> str | None:
-        """Compatibility spelling used by the original FacebookUser model."""
-        return self.picture_url
-
     def __str__(self) -> str:
         year = "????" if self.birthday_year is None else f"{self.birthday_year:04}"
         return f"{self.name} ({self.birthday_day:02}/{self.birthday_month:02}/{year})"

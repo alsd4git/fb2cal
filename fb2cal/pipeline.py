@@ -31,7 +31,9 @@ def extract_birthdays(client: FacebookClient, offsets: Iterable[int] = (0, 3, 6,
     contacts = {}
     for offset_month in offsets:
         result = client.query_graph_ql_birthday_comet_monthly(offset_month)
-        for contact in transformer.transform_birthday_comet_monthly_to_birthdays(result):
+        for contact in transformer.transform_birthday_comet_monthly_to_birthdays(
+            result
+        ):
             contacts[contact.id] = contact
     return sorted(contacts.values())
 
