@@ -8,6 +8,7 @@ from ics.grammar.parse import ContentLine
 
 from .__init__ import __github_short_url__, __status__, __version__
 from .logger import Logger
+from .text_format import serialize_content_lines
 from .utils import generate_facebook_profile_url_permalink
 
 """ Write Birthdays to an ICS file """
@@ -86,8 +87,7 @@ class ICSWriter:
         self.birthday_calendar = c
 
     def write(self, ics_file_path):
-        # Remove blank lines
-        ics_str = "".join([line.rstrip("\n") for line in self.birthday_calendar])
+        ics_str = self.export()
 
         self.logger.info("Saving ICS file to local file system...")
 
@@ -101,6 +101,9 @@ class ICSWriter:
         self.logger.info(
             f"Successfully saved ICS file to {os.path.abspath(ics_file_path)}"
         )
+
+    def export(self):
+        return serialize_content_lines(self.birthday_calendar)
 
     def get_birthday_calendar(self):
         return self.birthday_calendar

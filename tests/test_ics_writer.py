@@ -179,3 +179,13 @@ END:VCALENDAR
         writer.generate()
         event = next(iter(writer.get_birthday_calendar().events))
         self.assertEqual(event.begin.format("YYYY-MM-DD"), "2021-02-28")
+
+    @freeze_time("2020-12-01")
+    def test_export_uses_crlf_and_folds_long_lines(self):
+        self.ics_writer.generate()
+        output = self.ics_writer.export()
+        self.assertNotIn("\n", output.replace("\r\n", ""))
+        lines = output.encode("utf-8").split(b"\r\n")
+        self.assertEqual(lines[-1], b"")
+        self.assertTrue(all(len(line) <= 75 for line in lines[:-1]))
+        self.assertEqual(len(Calendar(output).events), len(self.contacts))

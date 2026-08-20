@@ -36,6 +36,12 @@ def build_parser():
     _add_auth_args(export)
     export.add_argument("--format", choices=("ics", "json", "vcf"), default="ics")
     export.add_argument(
+        "--vcard-version",
+        choices=("4.0", "3.0"),
+        default="4.0",
+        help="vCard version for --format vcf (default: 4.0; use 3.0 for legacy clients)",
+    )
+    export.add_argument(
         "--output", help="output path; omit to write the selected format to stdout"
     )
     doctor = subparsers.add_parser(
@@ -81,19 +87,19 @@ def _create_client(args):
     return FacebookClient(session=FacebookSession.from_cookie_file(args.cookies))
 
 
-def _export_contacts(contacts, output_format, output_path):
+def _export_contacts(contacts, output_format, output_path, vcard_version="4.0"):
     if not contacts:
         raise GraphQLSchemaError("Facebook returned no birthday contacts")
     if output_format == "json":
         writer = JSONExporter(contacts)
         content = writer.export()
     elif output_format == "vcf":
-        writer = VCardExporter(contacts)
+        writer = VCardExporter(contacts, version=vcard_version)
         content = writer.export()
     else:
         writer = ICSWriter(contacts)
         writer.generate()
-        content = "".join(line.rstrip("\n") for line in writer.get_birthday_calendar())
+        content = writer.export()
     if output_path:
         writer.write(output_path)
     else:
@@ -116,7 +122,7 @@ def run_export(args):
     client = _create_client(args)
     client.validate_session()
     contacts = extract_birthdays(client)
-    _export_contacts(contacts, args.format, args.output)
+    _export_contacts(contacts, args.format, args.output, args.vcard_version)
     _print_recap(contacts)
     return 0
 
