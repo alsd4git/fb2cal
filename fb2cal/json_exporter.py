@@ -12,7 +12,9 @@ from .pipeline import summarize_contacts
 
 
 class JSONExporter:
-    def __init__(self, contacts: Iterable[BirthdayContact], extracted_at: str | None = None):
+    def __init__(
+        self, contacts: Iterable[BirthdayContact], extracted_at: str | None = None
+    ):
         self.contacts = list(contacts)
         self.extracted_at = extracted_at or datetime.now(timezone.utc).isoformat()
 
@@ -33,3 +35,4 @@ class JSONExporter:
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(self.export(), encoding="utf-8")
+        target.chmod(0o600)

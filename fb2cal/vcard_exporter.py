@@ -11,7 +11,12 @@ from .contact import BirthdayContact
 def _escape(value: str | None) -> str:
     if not value:
         return ""
-    return value.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+    return (
+        value.replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\n", "\\n")
+    )
 
 
 class VCardExporter:
@@ -21,7 +26,11 @@ class VCardExporter:
     def export(self) -> str:
         cards = []
         for contact in self.contacts:
-            birthday = f"{contact.birthday_year:04}-{contact.birthday_month:02}-{contact.birthday_day:02}" if contact.birthday_year is not None else f"--{contact.birthday_month:02}-{contact.birthday_day:02}"
+            birthday = (
+                f"{contact.birthday_year:04}-{contact.birthday_month:02}-{contact.birthday_day:02}"
+                if contact.birthday_year is not None
+                else f"--{contact.birthday_month:02}-{contact.birthday_day:02}"
+            )
             lines = [
                 "BEGIN:VCARD",
                 "VERSION:3.0",
@@ -41,3 +50,4 @@ class VCardExporter:
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(self.export(), encoding="utf-8", newline="")
+        target.chmod(0o600)

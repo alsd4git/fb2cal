@@ -2,7 +2,8 @@ import atexit
 import logging
 import os
 
-LOGGING_FILE_PATH = 'logs/fb2cal.log'
+LOGGING_FILE_PATH = "logs/fb2cal.log"
+
 
 class Logger:
     def __init__(self, name):
@@ -12,13 +13,15 @@ class Logger:
 
         if not logging.getLogger().handlers:
             logging.basicConfig(
-                format='[%(asctime)s] %(name)s %(levelname)s (%(funcName)s) %(message)s',
-                level=logging.DEBUG,
-                handlers=[logging.StreamHandler(),
-                        logging.FileHandler(LOGGING_FILE_PATH, encoding='UTF-8')]
+                format="[%(asctime)s] %(name)s %(levelname)s (%(funcName)s) %(message)s",
+                level=logging.INFO,
+                handlers=[
+                    logging.StreamHandler(),
+                    logging.FileHandler(LOGGING_FILE_PATH, encoding="UTF-8"),
+                ],
             )
             atexit.register(logging.shutdown)
-    
+
         self.logger = logging.getLogger(name)
 
     def getLogger(self):
