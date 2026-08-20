@@ -14,7 +14,13 @@ class TestFacebookClient(unittest.TestCase):
         session = requests.Session()
         session.cookies.set("c_user", "123", domain=".facebook.com")
         client = FacebookClient(session=session)
-        client.browser.get = Mock(return_value=types.SimpleNamespace(status_code=200, text=page_text, url="https://www.facebook.com/events/birthdays/"))
+        client.browser.get = Mock(
+            return_value=types.SimpleNamespace(
+                status_code=200,
+                text=page_text,
+                url="https://www.facebook.com/events/birthdays/",
+            )
+        )
         return client
 
     def test_validate_session_extracts_token_without_network(self):
@@ -35,10 +41,12 @@ class TestFacebookClient(unittest.TestCase):
 
     def test_query_uses_sanitized_response_parser(self):
         client = self._client('["DTSGInitialData",[],{"token":"fixture-token"}]')
-        client.browser.post = Mock(return_value=types.SimpleNamespace(
-            status_code=200,
-            text='for (;;);' + json.dumps({"data": {"viewer": {}}}),
-        ))
+        client.browser.post = Mock(
+            return_value=types.SimpleNamespace(
+                status_code=200,
+                text="for (;;);" + json.dumps({"data": {"viewer": {}}}),
+            )
+        )
         response = client.query_graph_ql_birthday_comet_monthly(0)
         self.assertIn("data", response)
         payload = client.browser.post.call_args.kwargs["data"]

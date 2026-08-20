@@ -3,78 +3,78 @@ import unittest
 from freezegun import freeze_time
 from ics import Calendar
 
-from fb2cal.facebook_user import FacebookUser
+from fb2cal.contact import BirthdayContact
 from fb2cal.ics_writer import ICSWriter
 
 
 class TestICSWriter(unittest.TestCase):
     def setUp(self):
-        self.facebook_users = [
-            FacebookUser(
-                '100000000', 
-                'John Smith', 
-                'https://www.facebook.com/john.smith.23', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000001_10161077510019848_299841799451806933_o.jpg',
+        self.contacts = [
+            BirthdayContact(
+                "100000000",
+                "John Smith",
+                "https://www.facebook.com/john.smith.23",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000001_10161077510019848_299841799451806933_o.jpg",
                 20,
                 1,
-                1994
+                1994,
             ),
-            FacebookUser(
-                '100000001', 
-                'Laura Daisy', 
-                'https://www.facebook.com/laura.dasy.2', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000002_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000001",
+                "Laura Daisy",
+                "https://www.facebook.com/laura.dasy.2",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000002_10161077510019848_299841799451806933_o.jpg",
                 12,
                 3,
-                1974
+                1974,
             ),
-            FacebookUser(
-                '100000002', 
-                '韩忠清', 
-                'https://www.facebook.com/韩忠清', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000002_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000002",
+                "韩忠清",
+                "https://www.facebook.com/韩忠清",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000002_10161077510019848_299841799451806933_o.jpg",
                 6,
                 6,
-                2001
+                2001,
             ),
-            FacebookUser(
-                '100000003', 
-                'حكيم هديّة', 
-                'https://www.facebook.com/hadiyya', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000003_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000003",
+                "حكيم هديّة",
+                "https://www.facebook.com/hadiyya",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000003_10161077510019848_299841799451806933_o.jpg",
                 26,
                 10,
-                1987
+                1987,
             ),
-            FacebookUser(
-                '100000004', 
-                'Leap Year', 
-                'https://www.facebook.com/leap.year', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000004_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000004",
+                "Leap Year",
+                "https://www.facebook.com/leap.year",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000004_10161077510019848_299841799451806933_o.jpg",
                 29,
                 2,
-                2004
+                2004,
             ),
-            FacebookUser(
-                '100000005', 
-                'Mónica Bellucci',
-                'https://www.facebook.com/mo.lucci', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000005_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000005",
+                "Mónica Bellucci",
+                "https://www.facebook.com/mo.lucci",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000005_10161077510019848_299841799451806933_o.jpg",
                 31,
                 12,
-                None
+                None,
             ),
-            FacebookUser(
-                '100000006', 
-                'Bob Jones',
-                'https://www.facebook.com/bob.jones', 
-                'https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000005_10161077510019848_299841799451806933_o.jpg',
+            BirthdayContact(
+                "100000006",
+                "Bob Jones",
+                "https://www.facebook.com/bob.jones",
+                "https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-1/cp0/p60x60/00000005_10161077510019848_299841799451806933_o.jpg",
                 24,
                 5,
-                None
+                None,
             ),
         ]
-        self.ics_writer = ICSWriter(self.facebook_users)
+        self.ics_writer = ICSWriter(self.contacts)
         self.maxDiff = None
 
     @freeze_time("2020-12-01")
@@ -166,10 +166,16 @@ END:VCALENDAR
 
     @freeze_time("2021-01-01")
     def test_unknown_year_february_29_uses_non_leap_target_year(self):
-        contact = FacebookUser(
-            '100000007', 'Unknown Leap', 'https://www.facebook.com/unknown.leap', None, 29, 2, None
+        contact = BirthdayContact(
+            "100000007",
+            "Unknown Leap",
+            "https://www.facebook.com/unknown.leap",
+            None,
+            29,
+            2,
+            None,
         )
         writer = ICSWriter([contact])
         writer.generate()
         event = next(iter(writer.get_birthday_calendar().events))
-        self.assertEqual(event.begin.format('YYYY-MM-DD'), '2021-02-28')
+        self.assertEqual(event.begin.format("YYYY-MM-DD"), "2021-02-28")

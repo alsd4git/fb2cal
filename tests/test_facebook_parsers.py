@@ -22,7 +22,9 @@ class TestFacebookParsers(unittest.TestCase):
         self.assertIn("data", parsed)
 
     def test_persisted_query_error_is_explicit(self):
-        body = json.dumps({"error": 100, "errorDescription": "Unknown persisted query doc_id"})
+        body = json.dumps(
+            {"error": 100, "errorDescription": "Unknown persisted query doc_id"}
+        )
         with self.assertRaises(PersistedQueryError):
             parse_birthday_response(body)
 

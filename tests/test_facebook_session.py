@@ -12,10 +12,27 @@ class TestFacebookSession(unittest.TestCase):
     def test_loads_full_cookie_export(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "cookies.json"
-            path.write_text(json.dumps({"cookies": [
-                {"name": "c_user", "value": "123", "domain": ".facebook.com", "path": "/"},
-                {"name": "xs", "value": "secret", "domain": ".facebook.com", "path": "/", "secure": True},
-            ]}))
+            path.write_text(
+                json.dumps(
+                    {
+                        "cookies": [
+                            {
+                                "name": "c_user",
+                                "value": "123",
+                                "domain": ".facebook.com",
+                                "path": "/",
+                            },
+                            {
+                                "name": "xs",
+                                "value": "secret",
+                                "domain": ".facebook.com",
+                                "path": "/",
+                                "secure": True,
+                            },
+                        ]
+                    }
+                )
+            )
             os.chmod(path, 0o600)
 
             session = FacebookSession.from_cookie_file(path)
