@@ -127,6 +127,19 @@ upstream maintainer on [PyPI](https://pypi.org/project/fb2cal/), so publishing t
 same name requires coordination with the upstream owner or a distinct distribution name. Until
 that decision is made, install and run the checkout with `uv`.
 
+The CI validates both the test matrix and the source/wheel distributions. Once a release version
+and distribution name are agreed, the release workflow can be used with a matching tag:
+
+```bash
+uv sync --locked --dev
+uv build
+git tag -a v2.0.0 -m "Release v2.0.0"
+git push origin v2.0.0
+```
+
+The tag workflow creates a GitHub release with the built artifacts. It does not publish to PyPI
+until package ownership and trusted-publishing credentials have been agreed.
+
 ## Upstream and contributions
 
 - Fork repository: [alsd4git/fb2cal](https://github.com/alsd4git/fb2cal)
