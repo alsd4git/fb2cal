@@ -33,7 +33,9 @@ jobs:
         run: uv sync --locked --dev
 
       - name: Check formatting and lint
-        run: uv run ruff check fb2cal tests
+        run: |
+          uv run ruff format --check fb2cal tests --exclude tests/mocks
+          uv run ruff check fb2cal tests
 
       - name: Run tests
         run: uv run pytest -q
