@@ -5,6 +5,8 @@ All notable changes to this fork are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the maintained fork uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ## [2.0.0] - 2026-08-19
 
 ### Added
@@ -27,4 +29,5 @@ and the maintained fork uses [Semantic Versioning](https://semver.org/spec/v2.0.
 
 Versions through 1.3.2 belong to the upstream project history.
 
+[Unreleased]: https://github.com/alsd4git/fb2cal/compare/v2.0.0...HEAD
 [2.0.0]: https://github.com/alsd4git/fb2cal/compare/v1.3.2...v2.0.0

@@ -27,6 +27,14 @@ jobs:
         run: |
           project_version="$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"])')"
           test "v${project_version}" = "${RELEASE_TAG}"
+          grep -F "## [${project_version}]" CHANGELOG.md
+
+      - name: Run quality checks
+        run: |
+          uv sync --locked --dev
+          uv run ruff format --check fb2cal tests --exclude tests/mocks
+          uv run ruff check fb2cal tests
+          uv run pytest -q
 
       - name: Build distributions
         run: uv build
