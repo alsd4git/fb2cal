@@ -2,10 +2,9 @@
 
 Export Facebook birthdays to calendar and contact files.
 
-[![Latest release](https://img.shields.io/github/release/alsd4git/fb2cal.svg?style=flat-square)](https://github.com/alsd4git/fb2cal/releases)
-[![Tests](https://img.shields.io/github/actions/workflow/status/alsd4git/fb2cal/test-fb2cal.yml?style=flat-square)](https://github.com/alsd4git/fb2cal/actions)
-[![Issues](https://img.shields.io/github/issues/alsd4git/fb2cal.svg?style=flat-square)](https://github.com/alsd4git/fb2cal/issues)
-[![License](https://img.shields.io/github/license/alsd4git/fb2cal.svg?style=flat-square)](https://github.com/alsd4git/fb2cal/blob/main/LICENSE)
+[![CI](https://github.com/alsd4git/fb2cal/actions/workflows/test-fb2cal.yml/badge.svg)](https://github.com/alsd4git/fb2cal/actions/workflows/test-fb2cal.yml)
+[![Latest release](https://img.shields.io/github/v/release/alsd4git/fb2cal)](https://github.com/alsd4git/fb2cal/releases)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
 This repository is a maintained fork of [mobeigi/fb2cal](https://github.com/mobeigi/fb2cal).
 The upstream project is preserved as a reference and as a possible source of focused upstream
