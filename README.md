@@ -122,6 +122,7 @@ changes. The generated ICS file advertises a twelve-hour publication TTL.
 uv sync --dev
 uv run pytest -q
 uv run python -m unittest discover tests
+uv run ruff format --check fb2cal tests --exclude tests/mocks
 uv run ruff check fb2cal tests
 uv build
 ```
@@ -135,14 +136,15 @@ upstream maintainer on [PyPI](https://pypi.org/project/fb2cal/), so publishing t
 same name requires coordination with the upstream owner or a distinct distribution name. Until
 that decision is made, install and run the checkout with `uv`.
 
-The CI validates both the test matrix and the source/wheel distributions. Once a release version
-and distribution name are agreed, the release workflow can be used with a matching tag:
+The CI validates both the test matrix and the source and wheel distributions. Once a release version
+and distribution name are agreed, the release workflow can be used with a matching tag. Record
+user-visible changes in [CHANGELOG.md](CHANGELOG.md) before creating it:
 
 ```bash
 uv sync --locked --dev
 uv build
-git tag -a v2.0.0 -m "Release v2.0.0"
-git push origin v2.0.0
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
+git push origin vX.Y.Z
 ```
 
 The tag workflow creates a GitHub release with the built artifacts. It does not publish to PyPI
