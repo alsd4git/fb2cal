@@ -34,29 +34,55 @@ fragile profile-page scrape.
 The command never scans browser profiles or decrypts browser databases. It requires an explicit
 JSON export of the cookies from a browser session that is already logged in to Facebook.
 
-## Quick start
+## Installation
 
-### From a checkout
+Install the exact wheel published with the tagged GitHub Release:
 
 ```bash
-git clone https://github.com/alsd4git/fb2cal.git
-cd fb2cal
-uv sync --dev
-uv run fb2cal doctor --cookies ./facebook-cookies.json
-uv run fb2cal export --cookies ./facebook-cookies.json \
+uv tool install https://github.com/alsd4git/fb2cal/releases/download/v2.0.0/fb2cal-2.0.0-py3-none-any.whl
+fb2cal --help
+```
+
+For a one-off run without keeping the tool installed:
+
+```bash
+uvx --from https://github.com/alsd4git/fb2cal/releases/download/v2.0.0/fb2cal-2.0.0-py3-none-any.whl fb2cal --help
+```
+
+`pip` can install the same wheel when preferred:
+
+```bash
+python -m pip install https://github.com/alsd4git/fb2cal/releases/download/v2.0.0/fb2cal-2.0.0-py3-none-any.whl
+```
+
+The examples are intentionally pinned to a concrete release so the installed artifact is
+reproducible. Replace `v2.0.0` and the wheel filename together when selecting another version.
+
+## Quick start
+
+Validate an exported browser session:
+
+```bash
+fb2cal doctor --cookies ./facebook-cookies.json
+```
+
+Export birthdays to an ICS calendar:
+
+```bash
+fb2cal export --cookies ./facebook-cookies.json \
   --format ics --output ./out/birthdays.ics
 ```
 
-The `out/` directory is ignored by Git. Keep generated files private because they contain
-personal contact data.
+The `out/` directory is ignored by Git when working from a checkout. Keep generated files private
+because they contain personal contact data.
 
 ### Export formats
 
 ```bash
-uv run fb2cal export --cookies ./facebook-cookies.json --format ics --output ./out/birthdays.ics
-uv run fb2cal export --cookies ./facebook-cookies.json --format json --output ./out/birthdays.json
-uv run fb2cal export --cookies ./facebook-cookies.json --format vcf --output ./out/birthdays.vcf
-uv run fb2cal export --cookies ./facebook-cookies.json --format vcf \
+fb2cal export --cookies ./facebook-cookies.json --format ics --output ./out/birthdays.ics
+fb2cal export --cookies ./facebook-cookies.json --format json --output ./out/birthdays.json
+fb2cal export --cookies ./facebook-cookies.json --format vcf --output ./out/birthdays.vcf
+fb2cal export --cookies ./facebook-cookies.json --format vcf \
   --vcard-version 3.0 --output ./out/birthdays-v3.vcf
 ```
 
@@ -93,7 +119,7 @@ Treat the exported file as a password: cookies are bearer credentials.
 4. Validate the session without writing an export:
 
    ```bash
-   uv run fb2cal doctor --cookies ./facebook-cookies.json
+   fb2cal doctor --cookies ./facebook-cookies.json
    ```
 
 5. If the session expires, authenticate in Chrome again and export a fresh file.
@@ -117,8 +143,13 @@ changes. The generated ICS file advertises a twelve-hour publication TTL.
 
 ## Development
 
+For source development, use a checkout instead of the installed Release artifact:
+
 ```bash
-uv sync --dev
+git clone https://github.com/alsd4git/fb2cal.git
+cd fb2cal
+uv sync --locked --dev
+uv run fb2cal --help
 uv run pytest -q
 uv run python -m unittest discover tests
 uv run ruff format --check fb2cal tests --exclude tests/mocks
@@ -128,16 +159,15 @@ uv build
 
 The test suite is fully offline and contains no Facebook credentials or personal data.
 
-## Packaging status
+## Packaging and releases
 
-This fork is source-first for now. The distribution name `fb2cal` is already published by the
-upstream maintainer on [PyPI](https://pypi.org/project/fb2cal/), so publishing this fork under the
-same name requires coordination with the upstream owner or a distinct distribution name. Until
-that decision is made, install and run the checkout with `uv`.
+This fork publishes wheel and source distributions through tagged GitHub Releases. It intentionally
+does not publish the fork as `fb2cal` on PyPI because that distribution name belongs to the upstream
+maintainer.
 
-The CI validates both the test matrix and the source and wheel distributions. Once a release version
-and distribution name are agreed, the release workflow can be used with a matching tag. Record
-user-visible changes in [CHANGELOG.md](CHANGELOG.md) before creating it:
+CI validates both the test matrix and the built distributions. To prepare a new release, record
+user-visible changes in [CHANGELOG.md](CHANGELOG.md), update the project version, verify the build,
+and push a matching tag:
 
 ```bash
 uv sync --locked --dev
@@ -146,8 +176,8 @@ git tag -a vX.Y.Z -m "Release vX.Y.Z"
 git push origin vX.Y.Z
 ```
 
-The tag workflow creates a GitHub release with the built artifacts. It does not publish to PyPI
-until package ownership and trusted-publishing credentials have been agreed.
+The tag workflow creates a GitHub Release with wheel and sdist artifacts. No PyPI credentials are
+required.
 
 ## Upstream and contributions
 
@@ -155,8 +185,9 @@ until package ownership and trusted-publishing credentials have been agreed.
 - Original project: [mobeigi/fb2cal](https://github.com/mobeigi/fb2cal)
 - Open issues in the original project: [mobeigi/fb2cal/issues](https://github.com/mobeigi/fb2cal/issues)
 
-Please open fork-specific issues and pull requests in this repository. Changes that are small and
-compatible with the upstream architecture may later be proposed upstream as focused pull requests.
+Fork-specific pull requests can be opened in this repository. Issues are currently disabled on the
+fork; changes that are small and compatible with the upstream architecture may later be proposed
+upstream as focused pull requests.
 
 ## License
 
