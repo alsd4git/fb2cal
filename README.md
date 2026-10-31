@@ -165,8 +165,10 @@ This fork publishes wheel and source distributions through tagged GitHub Release
 does not publish the fork as `fb2cal` on PyPI because that distribution name belongs to the upstream
 maintainer.
 
-CI validates both the test matrix and the built distributions. To prepare a new release, record
-user-visible changes in [CHANGELOG.md](CHANGELOG.md), update the project version, verify the build,
+CI runs tests on Linux, macOS, and Windows with Python 3.11–3.15, plus Python
+3.10 on Linux; formatting, lint, syntax and distribution checks run once on
+Linux with Python 3.15. To prepare a new release, record user-visible changes
+in [CHANGELOG.md](CHANGELOG.md), update the project version, verify the build,
 and push a matching tag:
 
 ```bash
